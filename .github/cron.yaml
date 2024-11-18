@@ -1,0 +1,4 @@
+name: Do things everyday at 9 am
+on:
+  schedule:
+    - cron: "0 9 1 * *"

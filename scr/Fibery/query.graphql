@@ -1,0 +1,50 @@
+query {
+  findArticles(published: {is: true}) {
+    name
+    publicId
+    content {
+      md
+    }
+    creationDate
+    date
+    description {
+      text
+    }
+    seoTitle
+    seoDescription {
+      text
+    }
+    slug
+    purpose {
+      id
+      name,
+      value
+    },
+    author {
+      name
+      authorTitle
+      avatars {
+        name
+        secret
+        contentType
+      }
+    },
+    files {
+      secret
+      name
+      contentType
+    }
+    tags {
+      name
+    }
+    category {
+      name
+    }
+    questions {
+      name
+      answer {
+        text
+      }
+    }
+  }
+}

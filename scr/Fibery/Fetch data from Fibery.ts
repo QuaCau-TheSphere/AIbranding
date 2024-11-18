@@ -10,10 +10,10 @@ export async function getFiberyArticles(): Promise<FiberyArticle[] | never[]> {
   const FIBERY_ARTICLE_SPACE = getEnv("FIBERY_ARTICLE_SPACE");
   const fiberyEndPoint = `${FIBERY_HOST}/api/graphql/space/${FIBERY_ARTICLE_SPACE}`;
 
-  const query = await Deno.readTextFile("scr/Fibery/query.graphql");
+  const queryBody = JSON.stringify({ query: await Deno.readTextFile("scr/Fibery/query.graphql") });
   const result = await (await fetch(fiberyEndPoint, {
     method: "POST",
-    body: query,
+    body: queryBody,
     headers: {
       "Content-Type": `application/json`,
       Authorization: `Token ${FIBERY_TOKEN}`,
@@ -23,7 +23,6 @@ export async function getFiberyArticles(): Promise<FiberyArticle[] | never[]> {
     log.error(`Fibery API returns message: "${result.message}"`);
     return [];
   }
-  // if (!result.data) throw Error(`Fibery API returns message: "${result.message}"`);
   return result.data[`find${FIBERY_ARTICLE_DATABASE}`];
 }
 

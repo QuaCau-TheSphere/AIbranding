@@ -9,7 +9,7 @@ for (const article of await getFiberyArticles()) {
   console.log(creationDate, name);
 
   ensureDir("Fetched content");
-  const fetchedPath = resolve("Fetched content", `${name}.md`);
+  const fetchedPath = resolve("Fetched content", `${name}.md`.replace(/[/\\?%*:|"<>]/g, "-"));
   await Deno.writeTextFile(fetchedPath, content.md);
 }
 

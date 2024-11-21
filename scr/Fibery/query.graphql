@@ -1,5 +1,5 @@
 query {
-  findArticles(published: {is: true}) {
+  findArticles(published: {is: true} orderBy: {creationDate: DESC}) {
     name
     publicId
     content {

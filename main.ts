@@ -1,16 +1,18 @@
-import { resolve } from "jsr:@std/path/resolve";
-import { ensureDir } from "jsr:@std/fs/ensure-dir";
+import * as log from "jsr:@std/log";
+log.info("Start program");
 
-import { getFiberyArticles } from "./scr/Fibery/Fetch data from Fibery.ts";
+import { downloadArticleAndImages, getFiberyArticles } from "./scr/Fibery/Fetch data from Fibery.ts";
 import { postToFacebook } from "./scr/Post to Facebook.ts";
 
-for (const article of await getFiberyArticles()) {
-  const { name, content, creationDate } = article;
-  console.log(creationDate, name);
+try {
+  // const articles = await getFiberyArticles();
+  // const { articlePath, imagePaths } = await downloadArticleAndImages(articles[0]);
 
-  ensureDir("Fetched content");
-  const fetchedPath = resolve("Fetched content", `${name}.md`.replace(/[/\\?%*:|"<>]/g, "-"));
-  await Deno.writeTextFile(fetchedPath, content.md);
+  const articlePath = "D:/QC supplements/Code/Apps/Xây nhân hiệu tự động/Fetched content/test.md";
+  const article = await Deno.readTextFile(articlePath);
+  const imagePaths = "D:/QC supplements/Code/Apps/Xây nhân hiệu tự động/Fetched content/LinhRab.jpg";
+  await postToFacebook(article, [imagePaths]);
+  log.info("Done");
+} catch (error) {
+  console.error(error);
 }
-
-// await postToFacebook(content.md);

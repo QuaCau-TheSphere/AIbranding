@@ -1,23 +1,27 @@
 import * as log from "jsr:@std/log";
-import "jsr:@std/dotenv/load";
 import { FiberyArticle } from "./types.ts";
-import { getEnv } from "../utils.ts";
+import { resolve } from "jsr:@std/path/resolve";
+import { ensureDir } from "jsr:@std/fs/ensure-dir";
+import { createQueryBody, getEnv, header } from "../utils.ts";
+
+import { Image } from "npm:mdast";
+import { visit } from "npm:unist-util-visit";
+import { fromMarkdown } from "npm:mdast-util-from-markdown";
+import { Destination, download } from "https://deno.land/x/download/mod.ts";
 
 export async function getFiberyArticles(): Promise<FiberyArticle[] | never[]> {
-  const FIBERY_TOKEN = getEnv("FIBERY_TOKEN");
   const FIBERY_HOST = getEnv("FIBERY_HOST");
   const FIBERY_ARTICLE_DATABASE = getEnv("FIBERY_ARTICLE_DATABASE");
   const FIBERY_ARTICLE_SPACE = getEnv("FIBERY_ARTICLE_SPACE");
   const fiberyEndPoint = `${FIBERY_HOST}/api/graphql/space/${FIBERY_ARTICLE_SPACE}`;
 
-  const queryBody = JSON.stringify({ query: await Deno.readTextFile("scr/Fibery/query.graphql") });
+  log.info("Get Fibery data...");
+  // console.info("Get Fibery data...");
+  const queryBody = await createQueryBody("scr/Fibery/query.graphql");
   const result = await (await fetch(fiberyEndPoint, {
     method: "POST",
     body: queryBody,
-    headers: {
-      "Content-Type": `application/json`,
-      Authorization: `Token ${FIBERY_TOKEN}`,
-    },
+    headers: header(),
   })).json();
   if (!result.data) {
     log.error(`Fibery API returns message: "${result.message}"`);
@@ -26,62 +30,49 @@ export async function getFiberyArticles(): Promise<FiberyArticle[] | never[]> {
   return result.data[`find${FIBERY_ARTICLE_DATABASE}`];
 }
 
-// function compare(a: FiberyArticle, b: FiberyArticle) {
-//   if (a.creationDate < b.creationDate) return -1;
-//   if (a.creationDate > b.creationDate) return 1;
-//   return 0;
-// }
+async function downloadImage(imageNode: Image) {
+  const FIBERY_HOST = getEnv("FIBERY_HOST");
+  const url = `${FIBERY_HOST}${imageNode.url}`;
+  try {
+    const fetchedDir = "./Fetched content/";
+    const imageName = imageNode.alt;
+    const destination: Destination = {
+      dir: fetchedDir,
+      file: imageName,
+    };
+    const reqInit: RequestInit = {
+      method: "GET",
+      headers: header(),
+    };
+    await download(url, destination, reqInit);
+    return resolve(fetchedDir, imageName);
+  } catch (err) {
+    log.error(err);
+  }
+}
 
-// export async function loadAvatar(author, avatarsCache, assetsDir) {
-//   const avatars = author?.avatars;
-//   if (avatars?.length) {
-//     const avatar = avatars[0];
-//     const secret = avatar.secret;
-//     const name = avatar.name;
-//     const ext = extname(name);
-//     const fileName = secret + ext;
-//     const cached = avatarsCache.get(secret);
-//     if (cached) {
-//       return fileName;
-//     }
-//     await downloadImage(`/api/files/${secret}`, assetsDir + "/" + fileName);
-//     avatarsCache.set(secret, fileName);
-//     return fileName;
-//   }
-//   return `fiberylogo.png`;
-// }
-// export async function downloadFeaturedAndSocialImage(files, articleDir) {
-//   let featuredImage;
-//   let socialImage;
-//   for (const { name, secret } of files) {
-//     const ext = extname(name);
-//     const nameWithoutExt = basename(name, ext);
-//     if (nameWithoutExt === "featuredImage" && !featuredImage) {
-//       featuredImage = secret + ext;
-//       await downloadImage(
-//         `/api/files/${secret}`,
-//         articleDir + "/" + featuredImage,
-//       );
-//     }
-//     if (nameWithoutExt === "socialImage" && !socialImage) {
-//       socialImage = secret + ext;
-//       await downloadImage(
-//         `/api/files/${secret}`,
-//         articleDir + "/" + featuredImage,
-//       );
-//     }
-//   }
-//   if (!featuredImage && files[0]) {
-//     const { name, secret } = files[0];
-//     const ext = extname(name);
-//     featuredImage = secret + ext;
-//     await downloadImage(
-//       `/api/files/${secret}`,
-//       articleDir + "/" + featuredImage,
-//     );
-//   }
-//   return {
-//     featuredImage: featuredImage || socialImage,
-//     socialImage: socialImage || featuredImage,
-//   };
-// }
+export async function downloadArticleAndImages(article: FiberyArticle) {
+  log.info("Download article and images");
+  const { name, content, creationDate } = article;
+  console.log(creationDate, name);
+
+  ensureDir("Fetched content");
+  const articlePath = resolve("Fetched content", `${name}.md`.replace(/[/\\?%*:|"<>]/g, "-"));
+  await Deno.writeTextFile(articlePath, content.md);
+
+  const imageNodes: Image[] = [];
+  const tree = fromMarkdown(content.md);
+  visit(tree, function (node) {
+    if (node.type === "image") {
+      imageNodes.push(node);
+    }
+  });
+  const imagePaths: Array<string | undefined> = [];
+  for (const imageNode of imageNodes) {
+    imagePaths.push(await downloadImage(imageNode));
+  }
+  return {
+    articlePath: articlePath,
+    imagePaths: imagePaths,
+  };
+}

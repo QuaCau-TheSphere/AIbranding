@@ -15,36 +15,10 @@ query {
       text
     }
     slug
-    purpose {
-      id
-      name,
-      value
-    },
-    author {
-      name
-      authorTitle
-      avatars {
-        name
-        secret
-        contentType
-      }
-    },
     files {
       secret
       name
       contentType
-    }
-    tags {
-      name
-    }
-    category {
-      name
-    }
-    questions {
-      name
-      answer {
-        text
-      }
     }
   }
 }

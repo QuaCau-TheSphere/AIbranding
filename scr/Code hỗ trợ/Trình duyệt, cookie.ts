@@ -1,5 +1,5 @@
-import * as log from "jsr:@std/log";
-import puppeteer, { KnownDevices, Page } from "npm:puppeteer";
+import * as log from "@std/log";
+import puppeteer, { Browser, Page } from "puppeteer";
 
 const args = ["--window-size=1920,1080"];
 export const minimal_args = [
@@ -39,13 +39,13 @@ export const minimal_args = [
   "--use-mock-keychain",
 ];
 
-async function writeCookie(page: puppeteer.Page, cookiesPath: string) {
+async function ghiCookie(page: puppeteer.Page, cookiesPath: string) {
   const cookies = await page.cookies();
   await Deno.writeTextFile(cookiesPath, JSON.stringify(cookies, null, 2));
   console.log("Session has been saved to " + cookiesPath);
 }
 
-export async function readCookie(page: Page) {
+export async function đọcCookie(page: Page) {
   const cookiesPath = "cookies.json";
   try {
     await Deno.lstat(cookiesPath);
@@ -62,24 +62,34 @@ export async function readCookie(page: Page) {
     log.debug(error);
     // console.error(error);
     console.log("Cookie not exists!");
-    await writeCookie(page, cookiesPath);
+    await ghiCookie(page, cookiesPath);
   }
 }
 
-export async function openBrowser(url: string) {
-  log.info(`Start browser. Open ${url}`);
-
-  const browser = await puppeteer.launch({
+export async function mởTrìnhDuyệt(debug = false) {
+  log.info("Mở trình duyệt");
+  const thiếtLậpTrìnhDuyệt = {
     executablePath: "C:/Users/ganuo/.cache/puppeteer/chrome/win64-125.0.6422.60/chrome-win64/chrome.exe",
-    // headless: false,
+    headless: !debug,
     userDataDir: "./user_data",
-    // devtools: true,
+    devtools: debug ? true : false,
     // dumpio: true,
     args: minimal_args.concat(args),
-  });
+  };
+
+  return await puppeteer.launch(thiếtLậpTrìnhDuyệt);
+}
+
+export async function mởTrangMới(url: string, browser: Browser) {
+  log.info(`Mở ${url}`);
   const page = await browser.newPage();
   await page.goto(url);
-
-  await readCookie(page);
+  await page.setViewport({
+    width: 1800,
+    height: 1200,
+    deviceScaleFactor: 1,
+    isMobile: false,
+  });
+  await đọcCookie(page);
   return page;
 }

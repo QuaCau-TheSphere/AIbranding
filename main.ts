@@ -1,18 +1,34 @@
-import * as log from "jsr:@std/log";
-log.info("Start program");
+import * as log from "@std/log";
+import { đăngLênFacebook } from "./scr/2. Đăng bài/Trang chủ Facebook.ts";
+import { mởTrìnhDuyệt } from "./scr/Code hỗ trợ/Trình duyệt, cookie.ts";
+import { truyVấnFibery, tảiBàiVàẢnh } from "./scr/1. Kéo bài/Fibery.ts";
+import { ensureDir } from "@std/fs/ensure-dir";
+import { NƠI_LƯU } from "./scr/Code hỗ trợ/env và hằng.ts";
 
-import { downloadArticleAndImages, getFiberyArticles } from "./scr/Fibery/Fetch data from Fibery.ts";
-import { postToFacebook } from "./scr/Post to Facebook.ts";
-
+const debug = true;
 try {
-  // const articles = await getFiberyArticles();
-  // const { articlePath, imagePaths } = await downloadArticleAndImages(articles[0]);
+  log.info("Kéo bài từ các nguồn");
 
-  const articlePath = "D:/QC supplements/Code/Apps/Xây nhân hiệu tự động/Fetched content/test.md";
-  const article = await Deno.readTextFile(articlePath);
-  const imagePaths = "D:/QC supplements/Code/Apps/Xây nhân hiệu tự động/Fetched content/LinhRab.jpg";
-  await postToFacebook(article, [imagePaths]);
-  log.info("Done");
+  await ensureDir(NƠI_LƯU);
+  const dsBài = [...await truyVấnFibery()];
+  for (const bài of dsBài) {
+    const { đườngDẫnTớiBài, dsĐườngDẫnTớiẢnh } = await tảiBàiVàẢnh(bài);
+  }
+
+  // const trìnhDuyệt = await mởTrìnhDuyệt(debug);
+  // await đăngLênFacebook(article, [imagePaths], trìnhDuyệt);
+  // await trìnhDuyệt.close();
 } catch (error) {
   console.error(error);
 }
+
+log.setup({
+  handlers: {
+    console: new log.ConsoleHandler("DEBUG"),
+    file: new log.FileHandler("WARN", {
+      filename: "./log.txt",
+      // you can change format of output message using any keys in `LogRecord`.
+      formatter: (record) => `${record.levelName} ${record.msg}`,
+    }),
+  },
+});

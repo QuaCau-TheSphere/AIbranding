@@ -1,3 +1,9 @@
 user_data
 draft
 .env
+node_modules
+credentials.json
+token.json
+calendarID.txt
+*.html
+test.py

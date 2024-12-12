@@ -1,25 +1,42 @@
 import * as log from "@std/log";
-import { đăngLênFacebook } from "./scr/2. Đăng bài/Trang chủ Facebook.ts";
-import { mởTrìnhDuyệt } from "./scr/Code hỗ trợ/Trình duyệt, cookie.ts";
-import { truyVấnFibery, tảiBàiVàẢnh } from "./scr/1. Kéo bài/Fibery.ts";
 import { ensureDir } from "@std/fs/ensure-dir";
 import { NƠI_LƯU } from "./scr/Code hỗ trợ/env và hằng.ts";
+import { truyVấnFibery, tảiBàiVàẢnh } from "./scr/1. Kéo bài/Fibery.ts";
+import { mởTrìnhDuyệt } from "./scr/Code hỗ trợ/Trình duyệt, cookie.ts";
+import { đăngLênFacebook } from "./scr/2. Đăng bài/Trang chủ Facebook.ts";
 
-const debug = true;
-try {
+const debug = false;
+// const debug = true;
+
+async function kéoBàiTừCácNguồn() {
   log.info("Kéo bài từ các nguồn");
-
   await ensureDir(NƠI_LƯU);
   const dsBài = [...await truyVấnFibery()];
+  return dsBài;
+}
+
+try {
+  const trìnhDuyệt = await mởTrìnhDuyệt(debug);
+  const dsBài = await kéoBàiTừCácNguồn();
   for (const bài of dsBài) {
     const { đườngDẫnTớiBài, dsĐườngDẫnTớiẢnh } = await tảiBàiVàẢnh(bài);
+    await đăngLênFacebook(đườngDẫnTớiBài, dsĐườngDẫnTớiẢnh, trìnhDuyệt);
+    // await đăngLênFacebook(undefined, [], trìnhDuyệt);
+    break;
   }
 
-  // const trìnhDuyệt = await mởTrìnhDuyệt(debug);
-  // await đăngLênFacebook(article, [imagePaths], trìnhDuyệt);
-  // await trìnhDuyệt.close();
+  await trìnhDuyệt.close();
+  log.info("Đã xong");
 } catch (error) {
-  console.error(error);
+  const { name } = error as Error;
+  switch (name) {
+    case "TargetCloseError":
+      console.error(name);
+      break;
+
+    default:
+      log.error(name);
+  }
 }
 
 log.setup({

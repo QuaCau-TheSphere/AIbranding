@@ -1,9 +1,4 @@
-user_data
+# user_data
 draft
-.env
+# .env
 node_modules
-credentials.json
-token.json
-calendarID.txt
-*.html
-test.py

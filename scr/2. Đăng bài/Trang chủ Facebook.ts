@@ -1,13 +1,13 @@
 import * as log from "@std/log";
 import { Browser, Page } from "puppeteer";
 import { lấyEnv } from "../Code hỗ trợ/env và hằng.ts";
-import { mởTrangMới } from "../Code hỗ trợ/Trình duyệt, cookie.ts";
+import { ghiCookie, mởTrangMới } from "../Code hỗ trợ/Trình duyệt, cookie.ts";
 
 async function login(page: Page) {
   const loginSelector = "::-p-text(login)";
-  const needsLogin = await page.$(loginSelector);
+  const cầnLogin = await page.$(loginSelector);
 
-  if (needsLogin) {
+  if (cầnLogin) {
     console.info("Đăng nhập vào Facebook");
 
     const email = lấyEnv("FACEBOOK_EMAIL");
@@ -20,9 +20,11 @@ async function login(page: Page) {
   }
 }
 
-async function tạoBàiViết(page: Page, text: string) {
+async function tạoBàiViết(page: Page, đườngDẫnTớiBài: string) {
   console.info("Mở ô nhập bài");
+  const text = await Deno.readTextFile(đườngDẫnTớiBài);
   await page.locator("::-p-text(What's on your mind)").click();
+  console.info("Gõ văn bản");
   await page.keyboard.type(text);
 }
 
@@ -44,15 +46,29 @@ async function chọnTrangĐểĐăngCùng(page: Page) {
   await page.locator('*[aria-label="Post"][role="button"]').click();
 }
 
-export async function đăngLênFacebook(text: string, imagePaths: Array<string | undefined>, trìnhDuyệt: Browser) {
+export async function đăngLênFacebook(đườngDẫnTớiBài: string | undefined, dsĐườngDẫnTớiẢnh: Array<string | undefined>, trìnhDuyệt: Browser) {
   log.info("Đăng lên Facebook");
+
   const url = "https://facebook.com/";
   const page = await mởTrangMới(url, trìnhDuyệt);
 
   await login(page);
-  await tạoBàiViết(page, text);
-  await đăngẢnh(page, imagePaths);
-  await chọnTrangĐểĐăngCùng(page);
-
-  log.info("Đã đăng lên Facebook");
+  const html = await page.content();
+  console.log("🚀 ~ đăngLênFacebook ~ html:", html);
+  const cầnXácThực2Lớp = await page.$("::-p-text(verify)");
+  if (cầnXácThực2Lớp) {
+    log.warn("Bị yêu cầu phải xác thực 2 lớp");
+  } else if (đườngDẫnTớiBài) {
+    try {
+      await tạoBàiViết(page, đườngDẫnTớiBài);
+      await đăngẢnh(page, dsĐườngDẫnTớiẢnh);
+      await chọnTrangĐểĐăngCùng(page);
+      log.info("Đã đăng lên Facebook");
+      await ghiCookie(page);
+    } catch (error) {
+      const { name } = error as Error;
+      if (name === "TimeoutError") throw name;
+      console.error(name);
+    }
+  } else console.info("Không có bài nào. Bỏ qua phần đăng bài");
 }

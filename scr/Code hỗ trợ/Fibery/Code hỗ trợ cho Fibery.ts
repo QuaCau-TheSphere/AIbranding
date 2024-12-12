@@ -1,10 +1,10 @@
 import { Image } from "mdast";
-import { visit } from "unist-util-visit";
-import { fromMarkdown } from "mdast-util-from-markdown";
-import { lấyEnv, NƠI_LƯU } from "../env và hằng.ts";
-import { Destination, download } from "https://deno.land/x/download/mod.ts";
 import * as log from "@std/log";
+import { visit } from "unist-util-visit";
 import { resolve } from "@std/path/resolve";
+import { lấyEnv, NƠI_LƯU } from "../env và hằng.ts";
+import { fromMarkdown } from "mdast-util-from-markdown";
+import { Destination, download } from "download";
 
 export async function tạoQueryBody(path: string) {
   return JSON.stringify({ query: await Deno.readTextFile(path) }, null, 2);

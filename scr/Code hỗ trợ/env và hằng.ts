@@ -6,3 +6,4 @@ export function lấyEnv(key: string): string {
   return value;
 }
 export const NƠI_LƯU = "Bài viết";
+export const ĐƯỜNG_DẪN_TỚI_COOKIE = "cookies.json";

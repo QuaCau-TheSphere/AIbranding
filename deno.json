@@ -27,7 +27,8 @@
     "mdast": "npm:mdast@^3.0.0",
     "mdast-util-from-markdown": "npm:mdast-util-from-markdown@^2.0.2",
     "puppeteer": "npm:puppeteer@^23.9.0",
-    "unist-util-visit": "npm:unist-util-visit@^5.0.0"
+    "unist-util-visit": "npm:unist-util-visit@^5.0.0",
+    "download": "https://deno.land/x/download/mod.ts"
   },
   "nodeModulesDir": "auto"
 }

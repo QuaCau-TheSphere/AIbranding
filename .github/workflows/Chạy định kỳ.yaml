@@ -1,0 +1,23 @@
+name: Chạy định kỳ
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    # - cron: "0 0 * * 0" # Mỗi tuần
+    - cron: "0 0 * * *" # Mỗi nửa đêm
+
+jobs:
+  cron:
+    name: Chạy chương trình
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4
+
+      - name: Cài Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: vx.x.x
+      - name: Cài Chrome
+        run: npx puppeteer browsers install chrome
+      - run: deno task start

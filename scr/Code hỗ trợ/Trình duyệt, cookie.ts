@@ -1,5 +1,6 @@
 import * as log from "@std/log";
 import puppeteer, { Browser, Page } from "puppeteer";
+import { ĐƯỜNG_DẪN_TỚI_COOKIE } from "./env và hằng.ts";
 
 const args = ["--window-size=1920,1080"];
 export const minimal_args = [
@@ -39,40 +40,39 @@ export const minimal_args = [
   "--use-mock-keychain",
 ];
 
-async function ghiCookie(page: puppeteer.Page, cookiesPath: string) {
+export async function ghiCookie(page: puppeteer.Page) {
   const cookies = await page.cookies();
-  await Deno.writeTextFile(cookiesPath, JSON.stringify(cookies, null, 2));
-  console.log("Session has been saved to " + cookiesPath);
+  await Deno.writeTextFile(ĐƯỜNG_DẪN_TỚI_COOKIE, JSON.stringify(cookies, null, 2));
+  console.log("Lưu cookie");
 }
 
 export async function đọcCookie(page: Page) {
-  const cookiesPath = "cookies.json";
   try {
-    await Deno.lstat(cookiesPath);
-    console.log("Cookie exists!");
-    const content = await Deno.readTextFile(cookiesPath);
-    const cookies = JSON.parse(content);
+    const cookies = JSON.parse(await Deno.readTextFile(ĐƯỜNG_DẪN_TỚI_COOKIE));
     if (cookies.length !== 0) {
+      console.log("Nạp cookie");
       await page.setCookie(...cookies);
-      console.log("Session has been loaded in the browser");
     } else {
       throw new Deno.errors.NotFound();
     }
   } catch (error) {
-    log.debug(error);
-    // console.error(error);
-    console.log("Cookie not exists!");
-    await ghiCookie(page, cookiesPath);
+    if (error instanceof Deno.errors.NotFound) {
+      console.log("Chưa có cookie");
+    } else {
+      log.error("Có lỗi khi nạp cookie");
+      console.error(error.message);
+    }
   }
 }
 
 export async function mởTrìnhDuyệt(debug = false) {
   log.info("Mở trình duyệt");
   const thiếtLậpTrìnhDuyệt = {
-    executablePath: "C:/Users/ganuo/.cache/puppeteer/chrome/win64-125.0.6422.60/chrome-win64/chrome.exe",
+    // executablePath: "C:/Users/ganuo/.cache/puppeteer/chrome/win64-125.0.6422.60/chrome-win64/chrome.exe",
+    executablePath: "/home/runner/.cache/puppeteer/chrome/linux-131.0.6778.108/chrome-linux64/chrome",
     headless: !debug,
     userDataDir: "./user_data",
-    devtools: debug ? true : false,
+    devtools: debug,
     // dumpio: true,
     args: minimal_args.concat(args),
   };
@@ -90,6 +90,6 @@ export async function mởTrangMới(url: string, browser: Browser) {
     deviceScaleFactor: 1,
     isMobile: false,
   });
-  await đọcCookie(page);
+  // await đọcCookie(page);
   return page;
 }

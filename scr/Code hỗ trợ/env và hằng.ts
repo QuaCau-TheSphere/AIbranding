@@ -1,9 +1,20 @@
-import "jsr:@std/dotenv/load";
+import { parse } from "@std/yaml";
 
-export function lấyEnv(key: string): string {
-  const value = Deno.env.get(key);
-  if (!value) throw new Error(`${key} không được thiết lập trong env`);
-  return value;
+interface ThiếtLập {
+  Fibery: {
+    Host: string;
+    Token: string;
+    Database: string;
+    Space: string;
+  };
+  Facebook: {
+    "Profile url": string;
+    Email: string;
+    Password: string;
+  };
 }
+
+export const thiếtLập = parse(await Deno.readTextFile("./Thiết lập.yaml")) as ThiếtLập;
+
 export const NƠI_LƯU = "Bài viết";
 export const ĐƯỜNG_DẪN_TỚI_COOKIE = "cookies.json";

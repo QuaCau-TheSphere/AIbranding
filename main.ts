@@ -5,8 +5,8 @@ import { truyVấnFibery, tảiBàiVàẢnh } from "./scr/1. Kéo bài/Fibery.ts
 import { mởTrìnhDuyệt } from "./scr/Code hỗ trợ/Trình duyệt, cookie.ts";
 import { đăngLênFacebook } from "./scr/2. Đăng bài/Trang chủ Facebook.ts";
 
-const debug = false;
-// const debug = true;
+// const debug = false;
+const debug = true;
 
 async function kéoBàiTừCácNguồn() {
   log.info("Kéo bài từ các nguồn");
@@ -33,6 +33,9 @@ try {
     case "TargetCloseError":
       console.error(name);
       break;
+    case "TimeoutError":
+      log.error(name);
+      throw "";
 
     default:
       log.error(name);

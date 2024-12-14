@@ -67,15 +67,30 @@ export async function đọcCookie(page: Page) {
 
 export async function mởTrìnhDuyệt(debug = false) {
   log.info("Mở trình duyệt");
-  const thiếtLậpTrìnhDuyệt = {
-    // executablePath: "C:/Users/ganuo/.cache/puppeteer/chrome/win64-125.0.6422.60/chrome-win64/chrome.exe",
-    executablePath: "/home/runner/.cache/puppeteer/chrome/linux-131.0.6778.108/chrome-linux64/chrome",
-    headless: !debug,
-    userDataDir: "./user_data",
-    devtools: debug,
-    // dumpio: true,
-    args: minimal_args.concat(args),
-  };
+
+  let thiếtLậpTrìnhDuyệt;
+  switch (Deno.build.os) {
+    case "windows":
+      thiếtLậpTrìnhDuyệt = {
+        executablePath: "C:/Users/ganuo/.cache/puppeteer/chrome/win64-125.0.6422.60/chrome-win64/chrome.exe",
+        headless: !debug,
+        userDataDir: "./user_data",
+        devtools: debug,
+        // dumpio: true,
+        args: minimal_args.concat(args),
+      };
+      break;
+
+    default:
+      log.info("Linux");
+      thiếtLậpTrìnhDuyệt = {
+        executablePath: "/home/runner/.cache/puppeteer/chrome/linux-131.0.6778.108/chrome-linux64/chrome",
+        userDataDir: "./user_data",
+        // dumpio: true,
+        args: minimal_args.concat(args),
+      };
+      break;
+  }
 
   return await puppeteer.launch(thiếtLậpTrìnhDuyệt);
 }

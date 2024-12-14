@@ -22,6 +22,7 @@
     "jsr:@std/path@0.223.0": "0.223.0",
     "jsr:@std/path@^1.0.7": "1.0.8",
     "jsr:@std/path@^1.0.8": "1.0.8",
+    "jsr:@std/yaml@^1.0.5": "1.0.5",
     "jsr:@zip-js/zip-js@2.7.41": "2.7.41",
     "npm:@types/node@*": "22.5.4",
     "npm:dotenv@*": "16.4.5",
@@ -125,6 +126,9 @@
     },
     "@std/path@1.0.8": {
       "integrity": "548fa456bb6a04d3c1a1e7477986b6cffbce95102d0bb447c67c4ee70e0364be"
+    },
+    "@std/yaml@1.0.5": {
+      "integrity": "71ba3d334305ee2149391931508b2c293a8490f94a337eef3a09cade1a2a2742"
     },
     "@zip-js/zip-js@2.7.41": {
       "integrity": "a883116c1b46673de643f9cd3b6619d746271b96cd9a8e2b9d0bb8353d764d3d"
@@ -1460,6 +1464,7 @@
       "jsr:@std/fs@^1.0.6",
       "jsr:@std/log@~0.224.11",
       "jsr:@std/path@^1.0.8",
+      "jsr:@std/yaml@^1.0.5",
       "npm:linkedom@~0.18.5",
       "npm:mdast-util-from-markdown@^2.0.2",
       "npm:mdast@3",

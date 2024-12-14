@@ -2,7 +2,7 @@ import { Image } from "mdast";
 import * as log from "@std/log";
 import { visit } from "unist-util-visit";
 import { resolve } from "@std/path/resolve";
-import { lấyEnv, NƠI_LƯU } from "../env và hằng.ts";
+import { NƠI_LƯU, thiếtLập } from "../env và hằng.ts";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { Destination, download } from "download";
 
@@ -10,11 +10,11 @@ export async function tạoQueryBody(path: string) {
   return JSON.stringify({ query: await Deno.readTextFile(path) }, null, 2);
 }
 
+const { Host: host, Token: token } = thiếtLập.Fibery;
 export function header(): HeadersInit | undefined {
-  const FIBERY_TOKEN = lấyEnv("FIBERY_TOKEN");
   return {
     "Content-Type": `application/json`,
-    Authorization: `Token ${FIBERY_TOKEN}`,
+    Authorization: `Token ${token}`,
   };
 }
 
@@ -30,8 +30,7 @@ export function dsNodeẢnh(md: BàiTrênFibery["content"]["md"]) {
 }
 
 export async function tảiẢnh(imageNode: Image) {
-  const FIBERY_HOST = lấyEnv("FIBERY_HOST");
-  const url = `${FIBERY_HOST}${imageNode.url}`;
+  const url = `${host}${imageNode.url}`;
   try {
     const tênẢnh = imageNode.alt;
     const nơiLưu: Destination = {

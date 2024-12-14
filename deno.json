@@ -23,6 +23,7 @@
     "@std/fs": "jsr:@std/fs@^1.0.6",
     "@std/log": "jsr:@std/log@^0.224.11",
     "@std/path": "jsr:@std/path@^1.0.8",
+    "@std/yaml": "jsr:@std/yaml@^1.0.5",
     "linkedom": "npm:linkedom@^0.18.5",
     "mdast": "npm:mdast@^3.0.0",
     "mdast-util-from-markdown": "npm:mdast-util-from-markdown@^2.0.2",

@@ -1,6 +1,6 @@
 import * as log from "@std/log";
 import { Browser, Page } from "puppeteer";
-import { lấyEnv } from "../Code hỗ trợ/env và hằng.ts";
+import { thiếtLập } from "../Code hỗ trợ/env và hằng.ts";
 import { ghiCookie, mởTrangMới } from "../Code hỗ trợ/Trình duyệt, cookie.ts";
 
 async function login(page: Page) {
@@ -10,14 +10,14 @@ async function login(page: Page) {
   if (cầnLogin) {
     console.info("Đăng nhập vào Facebook");
 
-    const email = lấyEnv("FACEBOOK_EMAIL");
-    const password = lấyEnv("FACEBOOK_PASSWORD");
+    const { Email: email, Password: password } = thiếtLập.Facebook;
 
     await page.keyboard.type(email);
     page.keyboard.press("Tab");
     await page.keyboard.type(password);
     page.keyboard.press("Enter");
   }
+  await page.waitForNavigation({ waitUntil: "networkidle2" });
 }
 
 async function tạoBàiViết(page: Page, đườngDẫnTớiBài: string) {
@@ -26,6 +26,7 @@ async function tạoBàiViết(page: Page, đườngDẫnTớiBài: string) {
   await page.locator("::-p-text(What's on your mind)").click();
   console.info("Gõ văn bản");
   await page.keyboard.type(text);
+  await page.waitForNavigation({ waitUntil: "networkidle2" });
 }
 
 async function đăngẢnh(page: Page, imagePaths: (string | undefined)[]) {
@@ -35,6 +36,7 @@ async function đăngẢnh(page: Page, imagePaths: (string | undefined)[]) {
     const inputElement = await page.$('input[accept="image/*,image/heif,image/heic,video/*,video/mp4,video/x-m4v,video/x-matroska,.mkv"]');
     await inputElement?.uploadFile(imagePaths[0]!);
   }
+  await page.waitForNavigation({ waitUntil: "networkidle2" });
 }
 async function chọnTrangĐểĐăngCùng(page: Page) {
   console.info("Bấm next");
@@ -44,18 +46,15 @@ async function chọnTrangĐểĐăngCùng(page: Page) {
 
   console.info("Bấm post");
   await page.locator('*[aria-label="Post"][role="button"]').click();
+  await page.waitForNavigation({ waitUntil: "networkidle2" });
 }
 
 export async function đăngLênFacebook(đườngDẫnTớiBài: string | undefined, dsĐườngDẫnTớiẢnh: Array<string | undefined>, trìnhDuyệt: Browser) {
   log.info("Đăng lên Facebook");
-
-  const url = "https://facebook.com/";
-  const page = await mởTrangMới(url, trìnhDuyệt);
+  const page = await mởTrangMới("https://facebook.com/", trìnhDuyệt);
 
   await login(page);
-  const html = await page.content();
-  console.log("🚀 ~ đăngLênFacebook ~ html:", html);
-  const cầnXácThực2Lớp = await page.$("::-p-text(verify)");
+  const cầnXácThực2Lớp = page.url().includes("two_step_verification");
   if (cầnXácThực2Lớp) {
     log.warn("Bị yêu cầu phải xác thực 2 lớp");
   } else if (đườngDẫnTớiBài) {
@@ -67,8 +66,9 @@ export async function đăngLênFacebook(đườngDẫnTớiBài: string | undef
       await ghiCookie(page);
     } catch (error) {
       const { name } = error as Error;
-      if (name === "TimeoutError") throw name;
+      if (name === "TimeoutError") throw error;
       console.error(name);
     }
-  } else console.info("Không có bài nào. Bỏ qua phần đăng bài");
+  } else log.warn("Không có bài nào. Bỏ qua phần đăng bài");
+  await page.waitForNavigation({ waitUntil: "networkidle2" });
 }

@@ -1,13 +1,11 @@
 import * as log from "@std/log";
 import { resolve } from "@std/path/resolve";
-import { lấyEnv, NƠI_LƯU } from "../Code hỗ trợ/env và hằng.ts";
+import { NƠI_LƯU, thiếtLập } from "../Code hỗ trợ/env và hằng.ts";
 import { BàiTrênFibery, dsNodeẢnh, header, tạoQueryBody, tảiẢnh } from "../Code hỗ trợ/Fibery/Code hỗ trợ cho Fibery.ts";
 
 export async function truyVấnFibery(): Promise<BàiTrênFibery[] | never[]> {
-  const FIBERY_HOST = lấyEnv("FIBERY_HOST");
-  const FIBERY_ARTICLE_DATABASE = lấyEnv("FIBERY_ARTICLE_DATABASE");
-  const FIBERY_ARTICLE_SPACE = lấyEnv("FIBERY_ARTICLE_SPACE");
-  const fiberyEndPoint = `${FIBERY_HOST}/api/graphql/space/${FIBERY_ARTICLE_SPACE}`;
+  const { Host: host, Database: database, Space: space } = thiếtLập.Fibery;
+  const fiberyEndPoint = `${host}/api/graphql/space/${space}`;
 
   log.info("Lấy dữ liệu trên Fibery");
   const queryBody = await tạoQueryBody("scr/Code hỗ trợ/Fibery/query.graphql");
@@ -20,7 +18,7 @@ export async function truyVấnFibery(): Promise<BàiTrênFibery[] | never[]> {
     log.error(`Phản hồi từ Fibery: "${kếtQuả.message}"`);
     return [];
   }
-  return kếtQuả.data[`find${FIBERY_ARTICLE_DATABASE}`];
+  return kếtQuả.data[`find${database}`];
 }
 
 async function tảiTấtCảẢnh(md: string) {

@@ -1,0 +1,4 @@
+2024/12/17-00:40:45.984 36e0 Creating DB D:\QC supplements\Code\Apps\Xây nhân hiệu tự động\Xác thực đăng nhập\Dữ liệu người dùng\kendykangta99@gmail.com\Default\shared_proto_db since it was missing.
+2024/12/17-00:40:46.278 36e0 Reusing MANIFEST D:\QC supplements\Code\Apps\Xây nhân hiệu tự động\Xác thực đăng nhập\Dữ liệu người dùng\kendykangta99@gmail.com\Default\shared_proto_db/MANIFEST-000001
+2024/12/17-00:40:46.279 36e0 Recovering log #3
+2024/12/17-00:40:46.282 36e0 Reusing old log D:\QC supplements\Code\Apps\Xây nhân hiệu tự động\Xác thực đăng nhập\Dữ liệu người dùng\kendykangta99@gmail.com\Default\shared_proto_db/000003.log 

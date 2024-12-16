@@ -1,12 +1,10 @@
 import * as log from "@std/log";
 import { ensureDir } from "@std/fs/ensure-dir";
-import { NƠI_LƯU } from "./scr/Code hỗ trợ/env và hằng.ts";
-import { truyVấnFibery, tảiBàiVàẢnh } from "./scr/1. Kéo bài/Fibery.ts";
-import { mởTrìnhDuyệt } from "./scr/Code hỗ trợ/Trình duyệt, cookie.ts";
-import { đăngLênFacebook } from "./scr/2. Đăng bài/Trang chủ Facebook.ts";
-
-// const debug = false;
-const debug = true;
+import { basename, extname } from "@std/path";
+import { NƠI_LƯU } from "./Code hỗ trợ/env và hằng.ts";
+import { truyVấnFibery, tảiBàiVàẢnh } from "./1. Kéo bài/Fibery.ts";
+import { mởTrìnhDuyệt } from "./Code hỗ trợ/Trình duyệt, cookie.ts";
+import { đăngLênFacebook } from "./2. Đăng bài/Trang chủ Facebook.ts";
 
 async function kéoBàiTừCácNguồn() {
   log.info("Kéo bài từ các nguồn");
@@ -16,17 +14,18 @@ async function kéoBàiTừCácNguồn() {
 }
 
 try {
-  const trìnhDuyệt = await mởTrìnhDuyệt(debug);
+  const trìnhDuyệt = await mởTrìnhDuyệt();
   const dsBài = await kéoBàiTừCácNguồn();
   for (const bài of dsBài) {
     const { đườngDẫnTớiBài, dsĐườngDẫnTớiẢnh } = await tảiBàiVàẢnh(bài);
+    log.info(`Đăng bài ${basename(đườngDẫnTớiBài, extname(đườngDẫnTớiBài))}`);
     await đăngLênFacebook(đườngDẫnTớiBài, dsĐườngDẫnTớiẢnh, trìnhDuyệt);
     // await đăngLênFacebook(undefined, [], trìnhDuyệt);
     break;
   }
 
   await trìnhDuyệt.close();
-  log.info("Đã xong");
+  log.info("Đã chạy xong");
 } catch (error) {
   const { name } = error as Error;
   switch (name) {
@@ -34,8 +33,7 @@ try {
       console.error(name);
       break;
     case "TimeoutError":
-      log.error(name);
-      throw "";
+      break;
 
     default:
       log.error(name);
@@ -45,10 +43,5 @@ try {
 log.setup({
   handlers: {
     console: new log.ConsoleHandler("DEBUG"),
-    file: new log.FileHandler("WARN", {
-      filename: "./log.txt",
-      // you can change format of output message using any keys in `LogRecord`.
-      formatter: (record) => `${record.levelName} ${record.msg}`,
-    }),
   },
 });

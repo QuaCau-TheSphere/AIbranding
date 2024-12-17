@@ -3,8 +3,7 @@ import { thiếtLập } from "../Code hỗ trợ/env và hằng.ts";
 import { ghiCookie, mởTrangMới } from "../Code hỗ trợ/Trình duyệt, cookie.ts";
 
 async function login(page: Page) {
-  const loginSelector = "::-p-text(login)";
-  const cầnLogin = await page.$(loginSelector);
+  const cầnLogin = page.url().includes("login");
 
   if (cầnLogin) {
     const { Email: email, Password: password } = thiếtLập.Facebook;
@@ -36,7 +35,7 @@ const selectorẢnh = '*[aria-label="Photo/video"][role="button"]';
 async function tạoBàiViết(page: Page, đườngDẫnTớiBài: string) {
   console.info("Mở ô nhập bài");
   await page.locator(selector).click();
-  await page.waitForSelector(selectorẢnh);
+  // await page.waitForSelector(selectorẢnh);
 
   const text = await Deno.readTextFile(đườngDẫnTớiBài);
   console.info(`Gõ ${text.length} ký tự`);
@@ -54,7 +53,6 @@ async function đăngẢnh(page: Page, imagePaths: (string | undefined)[]) {
 }
 async function chọnTrangĐểĐăngCùng(page: Page) {
   console.info("Bấm next");
-  // await (await page.$(nextButtonSelector))!.click();
   await page.locator(nextButtonSelector).click();
 
   console.info("Bấm post");
@@ -65,7 +63,6 @@ export async function đăngLênFacebook(đườngDẫnTớiBài: string | undef
   const page = await mởTrangMới("https://facebook.com/", trìnhDuyệt);
   await login(page);
   await xácThực2lớp(page);
-
   if (đườngDẫnTớiBài) {
     try {
       await tạoBàiViết(page, đườngDẫnTớiBài);
@@ -74,9 +71,10 @@ export async function đăngLênFacebook(đườngDẫnTớiBài: string | undef
       console.info("Đã đăng lên Facebook");
       await ghiCookie(page);
     } catch (error) {
-      const { name } = error as Error;
+      const { name, message, cause } = error as Error;
       if (name === "TimeoutError") throw error;
-      console.error(name);
+      console.error(message);
+      console.error(cause);
     }
   } else console.warn("Không có bài nào. Bỏ qua phần đăng bài");
 }

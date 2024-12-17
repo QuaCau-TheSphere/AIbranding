@@ -1,6 +1,8 @@
 import * as log from "@std/log";
+import { resolve } from "@std/path/resolve";
+import { ensureDir } from "@std/fs/ensure-dir";
 import puppeteer, { Browser, Page } from "puppeteer";
-import { flags, ĐƯỜNG_DẪN_TỚI_COOKIE, ĐƯỜNG_DẪN_TỚI_DỮ_LIỆU_NGƯỜI_DÙNG } from "./env và hằng.ts";
+import { flags, ĐƯỜNG_DẪN_TỚI_COOKIE, ĐƯỜNG_DẪN_TỚI_DỮ_LIỆU_NGƯỜI_DÙNG, ĐƯỜNG_DẪN_TỚI_XÁC_THỰC_ĐĂNG_NHẬP } from "./env và hằng.ts";
 
 const args = ["--window-size=1920,1080"];
 export const minimal_args = [
@@ -42,6 +44,7 @@ export const minimal_args = [
 
 export async function ghiCookie(page: puppeteer.Page) {
   const cookies = await page.cookies();
+  await ensureDir(resolve(ĐƯỜNG_DẪN_TỚI_XÁC_THỰC_ĐĂNG_NHẬP, "Cookie"));
   await Deno.writeTextFile(ĐƯỜNG_DẪN_TỚI_COOKIE, JSON.stringify(cookies, null, 2));
   console.log("Lưu cookie");
 }

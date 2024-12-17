@@ -2,9 +2,9 @@ name: Chạy định kỳ
 on:
   push:
   workflow_dispatch:
-  schedule:
+  # schedule:
     # - cron: "0 0 * * 0" # Mỗi tuần
-    - cron: "0 0 * * *" # Mỗi nửa đêm
+    # - cron: "0 0 * * *" # Mỗi nửa đêm
 
 jobs:
   cron:

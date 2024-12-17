@@ -32,5 +32,4 @@
     "unist-util-visit": "npm:unist-util-visit@^5.0.0",
     "download": "https://deno.land/x/download/mod.ts"
   }
-  // "nodeModulesDir": "auto"
 }
